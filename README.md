@@ -92,4 +92,4 @@ The TestCase class has a lot built into it, both from Laravel and PHPUnit. The g
    - At least on `PetController` and `Pet` model, they should now have 100% coverage
    - Do not worry about the rest of the coverage
 10. Commit your work to your branch and submit a pull request
-   - assign Andrew as the reviewer
+    - assign Andrew as the reviewer
