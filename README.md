@@ -1,64 +1,91 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Lab Three
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Context
+Tests, while they may seem daunting and unapproachable, are a critical piece of the development lifecycle, because they ensure that our app works as we developers expect it to. Every new feature should include tests to verify that the code is doing what it was meant to do.
 
-## About Laravel
+This lab will give you some experience writing new tests, running tests, and inspecting a code coverage report so you can see what code in the app is and is not covered adequately.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Standard local setup
+1. open an Ubuntu terminal
+   1. make sure you're in your home directory, where you've hopefully already created a projects folder: `cd ~/projects`
+   2. make sure you have docker desktop running
+2. clone this repo: `git clone git@github.com:csci-2479-sp-2022/individual-lab-2.git`
+3. go into the project: `cd individual-lab-2`
+4. copy the `.env.example` file to `.env`
+5. run the following docker command to install our Sail dependencies:
+```
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v $(pwd):/var/www/html \
+    -w /var/www/html \
+    laravelsail/php81-composer:latest \
+    composer install --ignore-platform-reqs
+```
+6. start up the app: `./vendor/bin/sail up -d`
+7. create app key: `./vendor/bin/sail artisan key:generate`
+8. run database migrations (we aren't using the database for this lab): `./vendor/bin/sail artisan migrate`
+9. XDebug helper extension for Firefox/chrome (to avoid editing our Dockerfile):
+   - https://github.com/mac-cain13/xdebug-helper-for-chrome
+   - https://github.com/BrianGilbert/xdebug-helper-for-firefox
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Running tests
+1. Normal: `sail artisan test`
+2. Debug (so you can set a breakpoint in a test): `sail debug test`
+3. To see a code coverage report in the terminal: `sail composer test:coverage`
+   - This was setup as a custom composer script because `sail artisan test --coverage` will not work due to an `XDEBUG_MODE` conflict with our docker container
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Writing tests
+The TestCase class has a lot built into it, both from Laravel and PHPUnit. The general formula for writing tests in any framework is Arrange, Act, Assert:
+1. Arrange
+   - Define any expected data
+   - Setup any spies (mocked functions that can track behavior), using:
+        ```
+        $spy->shouldReceive('expectedMethod')
+            ->with($arg)
+            ->once() // number of times method should be called
+            ->andReturn($expectedValue);
+        ```
+2. Act
+   - Call whatever method should trigger the code under test. In our case it's calling a route, which our test class can do: `$this->get('/pets')`
+3. Assert
+   - Check that actual values match our expectations:
+     - `$this->assertViewHas('key', $value)`
+     - `$this->assertStatus(200)`
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Lab Instruction Steps
+1. Verify you can run the project on localhost, and get from home -> pet list -> pet details
+   - Note that petlist and pet details are served by the same route: `/pets/{id?}`
+   - Note the logic in the PetController to handle both scenarios (with ID and without)
+2. Verify you can run tests: `sail artisan test`
+3. Create a new branch for your work
+4. Create a new feature test to test the `PetController` class: `sail artisan make:test PetControllerTest`, and add the following:
+   - Create a private static function `getPets()` that will return some mock pet data, e.g.:
+        ```
+        return [
+            Pet::make([
+                'id' => 1,
+                'name' => 'Fido',
+                'age' => 5,
+                'type' => Pet::PET_TYPE_DOG,
+            ]),
+            Pet::make([
+                'id' => 2,
+                'name' => 'Milo',
+                'age' => 3,
+                'type' => Pet::PET_TYPE_CAT,
+            ]),
+        ];
+        ```
+    - Create private properties `array $pets` and `MockInterface $petServiceSpy`
+    - Create a protected setUp function that will set `$pets = self::getPets()` and spy on PetService: `$this->spy(PetService::class)`
+5. Create tests for:
+   - `getPets` without an ID param returns a list of pets
+   - `getPets` with a valid ID param returns a single pet
+   - `getPets` with an invalid ID param returns a 404 response
+6. Create a new unit test to test the `Pet` model: `sail artisan make:test PetTest`
+7. Create a test for verifying that calling `toString()` returns the expected string
+   - Arrange: define expected string value, initialize a `$pet` object
+   - Act: call `$pet->toString()` to get actual string value
+   - Assert expected and actual strings match: `$this->assertEquals($expectedString, $actualString)`
+8. Commit your work to your branch and submit a pull request
+   - assign Andrew as the reviewer
