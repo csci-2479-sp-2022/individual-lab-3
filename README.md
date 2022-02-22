@@ -87,5 +87,9 @@ The TestCase class has a lot built into it, both from Laravel and PHPUnit. The g
    - Arrange: define expected string value, initialize a `$pet` object
    - Act: call `$pet->toString()` to get actual string value
    - Assert expected and actual strings match: `$this->assertEquals($expectedString, $actualString)`
-8. Commit your work to your branch and submit a pull request
+8. Verify your tests pass: `sail artisan test`
+9. Verify your code coverage looks good: `sail composer test:coverage`
+   - At least on `PetController` and `Pet` model, they should now have 100% coverage
+   - Do not worry about the rest of the coverage
+10. Commit your work to your branch and submit a pull request
    - assign Andrew as the reviewer
