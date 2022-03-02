@@ -79,11 +79,6 @@ class PetControllerTest extends TestCase
 
     public function test_petRoute_returns_unsuccessful()
     {
-        // arrange
-        $this->petServiceSpy->shouldReceive('getPetById')
-            ->once()
-            ->andReturn($this->pets[0]);
-
         // act
         $response = $this->get('/pets/5');
 
