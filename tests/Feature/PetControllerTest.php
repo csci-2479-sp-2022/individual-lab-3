@@ -2,32 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Contracts\PetService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\Pet;
-use Mockery;
+use Tests\TestCase;
 use Mockery\MockInterface;
 
+
+
+
 class PetControllerTest extends TestCase {
-    private array $pets;
-    private MockInterface $petSpy;
-
-     /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-
-    protected function setUp(): void {
-        parent::setUp();
-        $this->petServiceSpy = $this->spy(PetService::class);
-    }
-
-    public function test_example() {
-        $response = $this->get('/');
-        $response->assertStatus(200);
-    }
+    private $pets = [];
+    private MockInterface $petServiceSpy;
 
     private static function getPets() {
         return [
@@ -35,44 +22,94 @@ class PetControllerTest extends TestCase {
                 'id' => 1,
                 'name' => 'Nemo',
                 'age' => 5,
-                'type' => 'fish',
+                'type' => Pet::PET_TYPE_DOG,
             ]),
             Pet::make([
-                'id' => 3,
+                'id' => 2,
                 'name' => 'Wallace',
-                'age' => 8,
-                'type' => 'rabbit',
+                'age' => 4,
+                'type' => Pet::PET_TYPE_CAT,
             ]),
         ];
 
     }
 
-    public function test_PetService_no_ID() {
-        return [
+    public function setUp(): void {
+        parent::setUp();
+        $this->pets = self::getPets();
+        $this->PetServiceSpy = $this->spy(PetService::class);
+    }
+
+    public function test_get_pets_returns_list() {
+        // arrange
+        $this->PetServiceSpy->shouldReceive('getPets')
+            ->once()
+            ->andReturn([
+                Pet::make([
+                    'id' => 1,
+                    'name' => 'Nemo',
+                    'age' => 5,
+                    'type' => Pet::PET_TYPE_DOG,
+                ]),
+                Pet::make([
+                    'id' => 2,
+                    'name' => 'Wallace',
+                    'age' => 4,
+                    'type' => Pet::PET_TYPE_CAT,
+                ]),
+            ]);
+
+        // act
+        $response = $this->get('/pets');
+
+        // assert
+        $response->assertStatus(200);
+        $response->assertViewHas('pets', [
             Pet::make([
+                'id' => 1,
                 'name' => 'Nemo',
                 'age' => 5,
-                'type' => 'fish'
+                'type' => Pet::PET_TYPE_DOG,
             ]),
             Pet::make([
+                'id' => 2,
                 'name' => 'Wallace',
-                'age' => 8,
-                'type' => 'rabbit',
+                'age' => 4,
+                'type' => Pet::PET_TYPE_CAT,
             ]),
-        ];
+        ]);
     }
 
-    public function test_PetService_Single_Pet() {
-        return [
+    public function test_get_pets_returns_single() {
+        // arrange
+        $this->PetServiceSpy->shouldReceive('getPetById')
+            ->once()
+            ->andReturn(
+                Pet::make([
+                    'id' => 2,
+                    'name' => 'Wallace',
+                    'age' => 4,
+                    'type' => Pet::PET_TYPE_CAT,
+                ]),
+            );
+
+        // act
+        $response = $this->get('/pets/1');
+
+        // assert
+        $response->assertStatus(200);
+        $response->assertViewHas('pet',
             Pet::make([
-                'name' => 'Nemo',
-                'age' => 5,
-                'type' => 'fish',
-            ])
-        ];
+                'id' => 2,
+                'name' => 'Wallace',
+                'age' => 4,
+                'type' => Pet::PET_TYPE_CAT,
+            ]),
+        );
     }
 
-    public function test_PetService_Return_404() {
-        return 404;
+    public function test_get_pets_invalid_id() {
+        $response = $this->get('/pets/3');
+        $response->assertStatus(404);
     }
 }
