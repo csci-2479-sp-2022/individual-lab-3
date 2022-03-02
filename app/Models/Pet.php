@@ -16,7 +16,7 @@ class Pet extends Model
         'id',
         'name',
         'age',
-        'type',
+        'type'
     ];
 
     public function toString(): string
