@@ -2,14 +2,14 @@
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 
 use App\Models\Pet;
+use Tests\TestCase;
 
 class PetTest extends TestCase
 {
 
-    public function test_toString(Pet $pet)
+    public function test_toString()
     {
         // arrange
         $pet = Pet::make([
@@ -25,6 +25,8 @@ class PetTest extends TestCase
         $actualString = $pet->toString();
 
         // assert
-        $this->assertEquals($expectedString, $actualYesNo);
+        $this->assertEquals($expectedString, $actualString);
     }
 }
+
+
