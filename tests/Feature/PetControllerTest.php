@@ -37,6 +37,7 @@ private static function getPets(){
             'type' => Pet::PET_TYPE_CAT,
         ]),
     ];
+}
 
     public function test_list_pets()
     {
@@ -80,7 +81,7 @@ private static function getPets(){
     public function test_pets_valid_id()
     {
         // arrange
-        $this->petServiceSpy->shouldReceive('getPetsById')
+        $this->petServiceSpy->shouldReceive('getPetById')
             ->once()
             ->andReturn(
                 Pet::make([
@@ -105,8 +106,7 @@ private static function getPets(){
             ]),
         );
     }
-        public function test_pets_invalid_id()
-    {
+        public function test_pets_invalid_id() {
         $response = $this->get('/pets/5');
 
         $response->assertStatus(404);

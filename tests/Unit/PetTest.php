@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use App\Models\Pet;
 
 class PetTest extends TestCase
 {
-    public function test_toString() {
+    public function test_toString_result() {
 
         // arrange
         $pet = Pet::make([
