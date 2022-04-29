@@ -10,9 +10,7 @@ class PetController extends Controller
 {
     public function __construct(
         private PetService $petService
-    ) {
-
-    }
+    ) {  }
 
     public function show(?int $id = null)
     {
