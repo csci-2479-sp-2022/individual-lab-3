@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\InMemoryPetService;
 use App\Contracts\PetService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,14 +22,14 @@ class PetController extends Controller
         return $this->getPetList();
     }
 
-    private function getPetList()
+    public function getPetList()
     {
         return view('pet-list', [
             'pets' => $this->petService->getPets(),
         ]);
     }
 
-    private function getPetDetails(int $id)
+    public function getPetDetails(int $id)
     {
         $pet = $this->petService->getPetById($id);
 
